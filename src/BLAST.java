@@ -1,4 +1,6 @@
-public class BLAST
+import java.util.ArrayList;
+
+abstract public class BLAST
 {
     protected int scoreCutoff;
     protected int wordLength;
@@ -14,13 +16,14 @@ public class BLAST
     protected void align(String subject, String query)
     {
         //seeds is an array of indexes into the query representing the words
-        int[] seeds = findSeeds(subject, query);
+        int[] seeds = findSeeds(query);
         ArrayList hits = new ArrayList();
+		ArrayList alignments = new ArrayList();
         
         int startRange, endRange;
         
         //1: find all exact matches between a word and some position in the query
-        int pos;
+        int pos = 0;
         for(int i = 0; i < seeds.length; i++)
         {
             pos = subject.indexOf(query.substring(seeds[i],seeds[i] + (wordLength-1)),pos);
@@ -28,23 +31,33 @@ public class BLAST
             {
                 //HSP(matching word index, position in query)
                 hits.add(new HSP(i,pos));
-                pos = subject.indexOf(query.substring(seeds[i],seeds[i] + (wordLength-1)),pos);
+                pos = subject.indexOf(query.substring(seeds[i],seeds[i] + (wordLength-1)),pos+1);
             }
+			pos = 0;
         }
         
         //2: extend the match forwards and backwards until the score decreases
-        for(int i = 0; i < hits.length(); i++)
+        for(int i = 0; i < hits.size(); i++)
         {
+			HSP temp = (HSP)hits.get(i);
             //extend forward
-            for(endRange = 0; endRange < subject.length() - wordLength && j < query.length() - wordLength; endRange++)
+            for(endRange = 0; endRange < subject.length() - wordLength && endRange < query.length() - wordLength; endRange++)
             {
                 //stop extending if we get a negative score
-                if(getScore(query.charAt(endRange+(hits.get(i).qPos + wordLength),subject.charAt(endRange+(hits.get(i).sPos + wordLength)))) < 0)
+				
+                if(getScore(query.charAt(endRange+(temp.qPos + wordLength)),subject.charAt(endRange+(temp.sPos + wordLength))) < 0)
                     break;
             }
             
             //extend backwards
-            for(startRange = 0; startRange < 
+            for(startRange = 1; startRange < temp.qPos && startRange < temp.sPos; startRange++)
+			{
+				if(getScore(query.charAt(temp.qPos - startRange),subject.charAt(temp.sPos - startRange)) < 0)
+					break;
+			}
+			
+			//query start, query end, subject start, subject end
+			alignments.add(new AlignRange(temp.qPos - startRange,temp.qPos + endRange,temp.sPos - startRange,temp.sPos + endRange));
         }
 
         //3: keep only the extended alignments that pass E score
@@ -52,5 +65,3 @@ public class BLAST
     }
                              
 }
-		
-		
