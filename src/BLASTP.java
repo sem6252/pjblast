@@ -74,7 +74,7 @@ public class BLASTP extends BLAST
                     foundSeeds.add(new Integer(i));
             }
         }
-    	int[] retval = new int[foundSeeds.size()];
+		int[] retval = new int[foundSeeds.size()];
 		
 		for(int i = 0; i < retval.length; i++)
 			retval[i] = foundSeeds.get(i).intValue();
