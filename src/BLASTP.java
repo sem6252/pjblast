@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class BLASTP extends BLAST
 {
     private final int[][] BLOSUM62 = 
@@ -30,7 +32,7 @@ public class BLASTP extends BLAST
         this.wordLength = 3;
         this.scoreCutoff = 25;
         this.gapOpenPenalty = 11;
-        this.gapExtendPenalty = 1;
+        this.gapExtensionPenalty = 1;
         this.scoringMatrix = BLOSUM62;
     }
     
@@ -40,39 +42,43 @@ public class BLASTP extends BLAST
         this.wordLength = wordLength;
         this.scoreCutoff = scoreCutoff;
         this.gapOpenPenalty = gapOpen;
-        this.gapExtendPenalty = gapExtend;
+        this.gapExtensionPenalty = gapExtend;
         this.scoringMatrix = userScoringMatrix;
     }
     
-    private int getScore(char a, char b)
+    protected int getScore(char a, char b)
     {
-        return scoringMatrix[aaToN(res1)][aaToN(res2)];
+        return scoringMatrix[aaToN(a)][aaToN(b)];
     }
     
     //self-scans the query for high-scoring words
     //NOTE: this is currently not a very efficient way of doing this and is O(n^2*wordLength)
-    private int[] findSeeds(String query)
+    protected int[] findSeeds(String query)
     {
-        ArrayList foundSeeds = new ArrayList();
+        ArrayList<Integer> foundSeeds = new ArrayList<Integer>();
         int currScore = 0;
         
         //this loop walks through the query, breaking it into words
         for(int i = 0; i < query.length() - wordLength; i++)
         {
             //this loops steps through the full length of the query
-            for(int j = 0; j < query.length() - wordLength, j++)
+            for(int j = 0; j < query.length() - wordLength; j++)
             {
                 //score the current word across the entire query
                 for(int k = 0; k < wordLength; k++)
                 {
-                    currScore = getScore(query.charAt(i+k),subject.charAt(j+k));
+                    currScore = getScore(query.charAt(i+k),query.charAt(j+k));
                 }
                 //i: the high-scoring word as indicated by index
                 if(currScore >= scoreCutoff)
                     foundSeeds.add(new Integer(i));
             }
         }
-        return foundSeeds.toArray();
+    	int[] retval = new int[foundSeeds.size()];
+		
+		for(int i = 0; i < retval.length; i++)
+			retval[i] = foundSeeds.get(i).intValue();
+		return retval;
     }    
     
     //TODO: invalid character error handling
