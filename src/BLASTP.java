@@ -30,7 +30,7 @@ public class BLASTP extends BLAST
     {
         //these are based on NCBI's defaults
         this.wordLength = 3;
-        this.scoreCutoff = 25;
+        this.scoreCutoff = 13;
         this.gapOpenPenalty = 11;
         this.gapExtensionPenalty = 1;
         this.scoringMatrix = BLOSUM62;
@@ -59,20 +59,21 @@ public class BLASTP extends BLAST
         int currScore = 0;
         
         //this loop walks through the query, breaking it into words
-        for(int i = 0; i < query.length() - wordLength; i++)
+        for(int i = 0; i <= query.length() - wordLength; i++)
         {
             //this loops steps through the full length of the query
-            for(int j = 0; j < query.length() - wordLength; j++)
+            for(int j = 0; j <= query.length() - wordLength; j++)
             {
                 //score the current word across the entire query
                 for(int k = 0; k < wordLength; k++)
                 {
                     currScore = getScore(query.charAt(i+k),query.charAt(j+k));
                 }
-                //i: the high-scoring word as indicated by index
-                if(currScore >= scoreCutoff)
-                    foundSeeds.add(new Integer(i));
             }
+            //if the word obtains a sufficient score against any portion of the query, keep it
+            //i: the high-scoring word as indicated by index
+            if(currScore >= scoreCutoff)
+                foundSeeds.add(new Integer(i));
         }
 		int[] retval = new int[foundSeeds.size()];
 		
