@@ -19,6 +19,7 @@ abstract public class BLAST
         int[] seeds = findSeeds(query);
         ArrayList hits = new ArrayList();
 		ArrayList alignments = new ArrayList();
+        int alignscore = 0;
         
         int startRange, endRange;
         
@@ -40,27 +41,33 @@ abstract public class BLAST
         for(int i = 0; i < hits.size(); i++)
         {
 			HSP temp = (HSP)hits.get(i);
+            int currScore = 0;
             //extend forward
             for(endRange = 0; endRange < subject.length() - wordLength && endRange < query.length() - wordLength; endRange++)
             {
                 //stop extending if we get a negative score
-				
-                if(getScore(query.charAt(endRange+(temp.qPos + wordLength)),subject.charAt(endRange+(temp.sPos + wordLength))) < 0)
+				currScore = getScore(query.charAt(endRange+(temp.qPos + wordLength)),subject.charAt(endRange+(temp.sPos + wordLength)))
+                if(currScore < 0)
                     break;
+                alignscore += currScore;
             }
             
             //extend backwards
             for(startRange = 1; startRange < temp.qPos && startRange < temp.sPos; startRange++)
 			{
-				if(getScore(query.charAt(temp.qPos - startRange),subject.charAt(temp.sPos - startRange)) < 0)
+                currScore = getScore(query.charAt(temp.qPos - startRange),subject.charAt(temp.sPos - startRange))
+				if(currScore < 0)
 					break;
+                alignscore += currScore;
 			}
 			
-			//query start, query end, subject start, subject end
-			alignments.add(new AlignRange(temp.qPos - startRange,temp.qPos + endRange,temp.sPos - startRange,temp.sPos + endRange));
+			//3: keep only the extended alignments that pass cutoff
+            if(alignscore > scoreCutoff)
+                //query start, query end, subject start, subject end
+                alignments.add(new AlignRange(temp.qPos - startRange,temp.qPos + endRange,temp.sPos - startRange,temp.sPos + endRange));
         }
 
-        //3: keep only the extended alignments that pass E score
+        
         //4: still working
     }
                              
