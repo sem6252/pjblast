@@ -46,7 +46,7 @@ abstract public class BLAST
             for(endRange = 0; endRange < subject.length() - wordLength && endRange < query.length() - wordLength; endRange++)
             {
                 //stop extending if we get a negative score
-				currScore = getScore(query.charAt(endRange+(temp.qPos + wordLength)),subject.charAt(endRange+(temp.sPos + wordLength)))
+				currScore = getScore(query.charAt(endRange+(temp.qPos + wordLength)),subject.charAt(endRange+(temp.sPos + wordLength)));
                 if(currScore < 0)
                     break;
                 alignscore += currScore;
@@ -55,7 +55,7 @@ abstract public class BLAST
             //extend backwards
             for(startRange = 1; startRange < temp.qPos && startRange < temp.sPos; startRange++)
 			{
-                currScore = getScore(query.charAt(temp.qPos - startRange),subject.charAt(temp.sPos - startRange))
+                currScore = getScore(query.charAt(temp.qPos - startRange),subject.charAt(temp.sPos - startRange));
 				if(currScore < 0)
 					break;
                 alignscore += currScore;
@@ -67,8 +67,8 @@ abstract public class BLAST
                 alignments.add(new AlignRange(temp.qPos - startRange,temp.qPos + endRange,temp.sPos - startRange,temp.sPos + endRange));
         }
 
-        
-        //4: still working
+        //4: compute the E (expect) score for each extended alignment
+        //5: perform Smith-Waterman alignment between each set of query/subject pairs
     }
                              
 }
