@@ -26,11 +26,14 @@ public class BLASTP extends BLAST
     
     private int[][] scoringMatrix;
     
+    private int wordCutoff;
+    
     public BLASTP()
     {
         //these are based on NCBI's defaults
         this.wordLength = 3;
-        this.scoreCutoff = 13;
+        this.wordCutoff = 13;
+        this.scoreCutoff = 23;
         this.gapOpenPenalty = 11;
         this.gapExtensionPenalty = 1;
         this.scoringMatrix = BLOSUM62;
@@ -56,24 +59,35 @@ public class BLASTP extends BLAST
     protected int[] findSeeds(String query)
     {
         ArrayList<Integer> foundSeeds = new ArrayList<Integer>();
-        int currScore = 0;
+        int currScore;
         
         //this loop walks through the query, breaking it into words
         for(int i = 0; i <= query.length() - wordLength; i++)
         {
+            currScore = 0;
+           // System.out.println("Word " + i + " " + query.substring(i,i+wordLength));
             //this loops steps through the full length of the query
             for(int j = 0; j <= query.length() - wordLength; j++)
             {
+                currScore = 0;
+               // System.out.println("Pair " + i + " " + query.substring(j,j+wordLength));
                 //score the current word across the entire query
                 for(int k = 0; k < wordLength; k++)
                 {
-                    currScore = getScore(query.charAt(i+k),query.charAt(j+k));
+                 //   System.out.print(getScore(query.charAt(i+k),query.charAt(j+k)) + " \n");
+                    currScore += getScore(query.charAt(i+k),query.charAt(j+k));
+                   // System.out.println("sum " + currScore);
+                }
+                
+                //if the word obtains a sufficient score against any portion of the query, keep it and stop
+                //i: the high-scoring word as indicated by index
+                if(currScore >= wordCutoff)
+                {
+                    foundSeeds.add(new Integer(i));
+                 //   System.out.println("Added " +query.substring(i,i+wordLength));
+                    break;
                 }
             }
-            //if the word obtains a sufficient score against any portion of the query, keep it
-            //i: the high-scoring word as indicated by index
-            if(currScore >= scoreCutoff)
-                foundSeeds.add(new Integer(i));
         }
 		int[] retval = new int[foundSeeds.size()];
 		
