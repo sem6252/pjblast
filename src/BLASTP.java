@@ -37,16 +37,21 @@ public class BLASTP extends BLAST
         this.gapOpenPenalty = 11;
         this.gapExtensionPenalty = 1;
         this.scoringMatrix = BLOSUM62;
+        this.eCutoff = 10;
+        this.K = 0.13;
+        this.LAM = 0.318;
     }
     
     //TODO: add invalid scoring matrix error handling
-    public BLASTP(int wordLength, int scoreCutoff,int gapOpen, int gapExtend, int[][] userScoringMatrix)
+    public BLASTP(int wordLength, int wordCutoff, int scoreCutoff,int gapOpen, int gapExtend, double eCut, int[][] userScoringMatrix)
     {
         this.wordLength = wordLength;
         this.scoreCutoff = scoreCutoff;
         this.gapOpenPenalty = gapOpen;
         this.gapExtensionPenalty = gapExtend;
         this.scoringMatrix = userScoringMatrix;
+        this.wordCutoff = wordCutoff;
+        this.eCutoff = eCut;
     }
     
     protected int getScore(char a, char b)

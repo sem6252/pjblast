@@ -6,6 +6,7 @@ abstract public class BLAST
     protected int wordLength;
     protected int gapOpenPenalty;
     protected int gapExtensionPenalty;
+    protected double eCutoff, K, LAM;
     
     //returns the score for any two letter pairs
     protected abstract int getScore(char a, char b);
@@ -20,6 +21,7 @@ abstract public class BLAST
         ArrayList hits = new ArrayList();
 		ArrayList alignments = new ArrayList();
         int alignscore = 0;
+        double eScore;
         
         int startRange, endRange, queryIndex, subjectIndex;
         
@@ -85,17 +87,22 @@ abstract public class BLAST
                 //compute the E score and keep only if above e score cutoff
             System.out.println("qrange " + (temp.qPos - startRange) + "," + (temp.qPos + (wordLength-1) + endRange));
             System.out.println("srange " + (temp.sPos - startRange) + "," + (temp.sPos + (wordLength-1) + endRange));
-            alignments.add(new AlignRange(temp.qPos - startRange,temp.qPos + (wordLength-1) + endRange,temp.sPos - startRange,temp.sPos + (wordLength-1) + endRange));
+           
+            eScore = findEScore(currScore, query.length(), subject.length());
+            if(eScore >= eCutoff)
+                alignments.add(new AlignRange(eScore, temp.qPos - startRange,temp.qPos + (wordLength-1) + endRange,temp.sPos - startRange,temp.sPos + (wordLength-1) + endRange));
         }
+        
         AlignRange[] results = new AlignRange[alignments.size()];
         alignments.toArray(results);
         return results;
     }
     
-    private void arrayprint(ArrayList arr)
+    private double findEScore(int score, int qLen, int sLen)
     {
-        for(int i = 0; i < arr.size(); i++)
-            System.out.print(((HSP)arr.get(i)).sPos + " ");
+        double y = K * qLen * sLen * Math.pow(Math.E,-(LAM*score));
+        
+        return 1 - Math.pow(Math.E,-y);
     }
                              
 }
