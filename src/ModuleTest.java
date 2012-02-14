@@ -1,8 +1,12 @@
+import edu.rit.pj.Comm;
+
 
 public class ModuleTest extends BLASTP
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
+    	Comm.init(args);
+    	long start = System.currentTimeMillis();
         BLASTP aligner = new BLASTP();
         ProteinSequence q, s;
         
@@ -30,6 +34,8 @@ public class ModuleTest extends BLASTP
                 {
                     out.printDetails(results[i], q, s);
                 }
+                long end = System.currentTimeMillis();
+                System.out.println(end-start + "msec");
                 break;
             case 3:
               /*  int score = 0;

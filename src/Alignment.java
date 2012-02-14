@@ -1,3 +1,7 @@
+//This file is based on Alignment.java from the Parallel Java library. It has been modified to
+//provide setters for all of the classes's instance variables.
+
+
 //******************************************************************************
 //
 // File:    Alignment.java

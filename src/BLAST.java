@@ -36,13 +36,13 @@ abstract public class BLAST
         int pos = 1;
         for(int i = 0; i < seeds.length; i++)
         {
-        	pos = indexOf(subject,Arrays.copyOfRange(query,seeds[i],seeds[i] + wordLength),pos);
+        	pos = indexOf(subject,getRange(query,seeds[i],seeds[i] + wordLength),pos);
         	
             while(pos != -1)
             {
                 //HSP(word's position in query, word's position in subject)
                 hits.add(new HSP(seeds[i],pos));
-                pos = indexOf(subject,Arrays.copyOfRange(query,seeds[i],seeds[i] + wordLength),pos+1);
+                pos = indexOf(subject,getRange(query,seeds[i],seeds[i] + wordLength),pos+1);
             }
 			pos = 1;
         }
@@ -98,7 +98,6 @@ abstract public class BLAST
             //add check for identical ranges
 			
 			//3: keep only the extended alignments that pass cutoff 
-            System.out.println(findEScore(currScore,querySeq.myLength,subjectSeq.myLength));
             if(findEScore(currScore,querySeq.myLength,subjectSeq.myLength) <= eCutoff)
             {
                 Alignment alignment = new Alignment();
@@ -142,7 +141,6 @@ abstract public class BLAST
     	}
     	return found;
     }
-                             
 }
 		
 		
