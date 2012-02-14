@@ -6,3 +6,10 @@
 43 16 10995
 43 32 6326
 n 43 53000 "N = 53K"
+eff yAxisStart 0.5
+eff xAxisEnd 45
+edsf yAxisStart 0.02
+edsf xAxisEnd 45
+speedup yAxisEnd 18
+speedup xAxisEnd 45
+#time yAxisEnd 2
