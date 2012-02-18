@@ -11,7 +11,7 @@ public class BLASTP extends BLAST
     {
         //these are based on NCBI's defaults
         this.wordLength = 3;
-        this.wordCutoff = 13;
+        this.wordCutoff = 1;
         this.scoreCutoff = 23;
         this.gapOpenPenalty = 11;
         this.gapExtensionPenalty = 1;
@@ -68,9 +68,7 @@ public class BLASTP extends BLAST
                 }
             }
         }
-        //create Alignment objects
-        
-        
+      
 		int[] retval = new int[foundSeeds.size()];
 		
 		for(int i = 0; i < retval.length; i++)

@@ -5,7 +5,7 @@ public class ModuleTest extends BLASTP
 {
     public static void main(String[] args) throws Exception
     {
-    	Comm.init(args);
+    	//Comm.init(args);
     	long start = System.currentTimeMillis();
         BLASTP aligner = new BLASTP();
         ProteinSequence q, s;
@@ -55,6 +55,19 @@ public class ModuleTest extends BLASTP
                 Alignment output = test.align();
                 AlignmentPrinter out1 = new AlignmentPrinter(System.out,new DefaultAlignmentStats(s.length()));
                 out1.printDetails(output, q, s);*/
+            	break;
+            case 5:
+            	Alignment one = new Alignment();
+            	Alignment two = new Alignment();
+            	one.setMyQueryStart(1);
+            	one.setMyQueryFinish(5);
+            	one.setMySubjectStart(4);
+            	one.setMySubjectFinish(8);
+            	two.setMyQueryStart(1);
+            	two.setMyQueryFinish(5);
+            	two.setMySubjectStart(4);
+            	two.setMySubjectFinish(8);
+            	System.out.println(one.equals(two));
             	break;
         }
         

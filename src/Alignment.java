@@ -54,7 +54,7 @@ import java.io.ObjectOutput;
  * @version 03-Jul-2008
  */
 public class Alignment
-	implements Externalizable, Comparable<Alignment>
+	implements Externalizable
 	{
 
 // Exported constants.
@@ -282,29 +282,24 @@ public class Alignment
 	public byte[] getMyTraceback() {
 		return myTraceback;
 	}
-
-	/**
-	 * Compare this alignment object to the given alignment object. The
-	 * comparison order depends on the alignment scores and the subject sequence
-	 * IDs. An alignment with a higher score comes before an alignment with a
-	 * lower score. If the scores are equal, an alignment with a lower subject
-	 * sequence ID comes before an alignment with a higher subject sequence ID.
-	 *
-	 * @param  alignment  Alignment to compare to.
-	 *
-	 * @return  An integer less than, equal to, or greater than 0 if this
-	 *          alignment comes before, is the same as, or comes after the given
-	 *          alignment, respectively.
-	 */
-	public int compareTo
-		(Alignment alignment)
-		{
-		if (this.myScore > alignment.myScore) return -1;
-		else if (this.myScore < alignment.myScore) return 1;
-		else if (this.mySubjectId < alignment.mySubjectId) return -1;
-		else if (this.mySubjectId > alignment.mySubjectId) return 1;
-		else return 0;
-		}
+        
+        
+    //two alignments are equal if they refer to the exact same ranges
+    public boolean equals(Object other)
+        {
+    		System.out.println("query " + this.getQueryStart() + "," + this.getQueryFinish());
+    		System.out.println("subject " + this.getSubjectStart() + "," + this.getSubjectFinish());
+            return (this.mySubjectStart == ((Alignment)other).mySubjectStart && this.mySubjectFinish == ((Alignment)other).mySubjectFinish
+            && this.myQueryStart == ((Alignment)other).myQueryStart && this.myQueryFinish == ((Alignment)other).myQueryFinish);
+        }
+        
+        //a hash code
+        public int hashCode()
+        {
+            int hash = this.myScore << 16 | this.myQueryStart << 8 | this.myQueryFinish << 4 | this.mySubjectStart << 2 | this.mySubjectFinish << 1;
+            
+            return hash & 28; //hash mod 29
+        }
 
 	/**
 	 * Returns a string version of this alignment object.

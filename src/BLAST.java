@@ -1,4 +1,5 @@
 
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -26,26 +27,49 @@ abstract public class BLAST
         //seeds is an array of indexes into the query representing the words
         int[] seeds = findSeeds(query);
         ArrayList<HSP> hits = new ArrayList<HSP>();
-		ArrayList<Alignment> alignments = new ArrayList<Alignment>();
+		HashSet<Alignment> alignments = new HashSet<Alignment>();
         int alignscore = 0;
         //double eScore;
         int startRange, endRange, queryIndex, subjectIndex;
+        
+       /* System.out.println("Seeds " + seeds.length);
+        for(int i = 0; i < seeds.length; i++)
+        {
+            System.out.println(seeds[i]);
+        }
+        
+        System.out.println("Words");
+        for(int i = 0; i < seeds.length; i++)
+        {
+            System.out.println(querySeq.elementsToString().substring(seeds[i]-1,seeds[i]+wordLength-1));
+        }*/
         
         //1: find all exact matches between a word and some position in the subject
         //start from 1 position, 0 position is unused
         int pos = 1;
         for(int i = 0; i < seeds.length; i++)
         {
+        	//System.out.println(i + " compare " + byteToStr(subject) + " and " + byteToStr(getRange(query,seeds[i],seeds[i] + wordLength)));
         	pos = indexOf(subject,getRange(query,seeds[i],seeds[i] + wordLength),pos);
         	
             while(pos != -1)
             {
                 //HSP(word's position in query, word's position in subject)
                 hits.add(new HSP(seeds[i],pos));
-                pos = indexOf(subject,getRange(query,seeds[i],seeds[i] + wordLength),pos+1);
+                pos = indexOf(subject,getRange(query,seeds[i],seeds[i] + wordLength-1),pos+1);
             }
 			pos = 1;
         }
+        
+      /*  System.out.println("indexOf " + byteToStr(getRange(query,seeds[1],seeds[1] + wordLength)) + " in " + byteToStr(subject));
+        System.out.println(indexOf(subject, getRange(query,seeds[1],seeds[1] + wordLength),1));
+        
+        System.out.println("Hits");
+        for(int i = 0; i < hits.size(); i++)
+        {
+        	System.out.println(hits.get(i).qPos + " " + hits.get(i).sPos);
+        }*/
+        	
         
         //2: extend the match forwards and backwards until the score decreases too much
         for(int i = 0; i < hits.size(); i++)
@@ -106,13 +130,15 @@ abstract public class BLAST
             	alignment.setMyQueryLength(querySeq.length());
             	alignment.setMySubjectLength(subjectSeq.length());
             	alignment.setMyQueryStart(temp.qPos - startRange);
-            	alignment.setMyQueryFinish(temp.qPos + (wordLength-1) + endRange);
+            	alignment.setMyQueryFinish(temp.qPos + (wordLength) + endRange);
             	alignment.setMySubjectStart(temp.sPos - startRange);
-            	alignment.setMySubjectFinish(temp.sPos + (wordLength-1) + endRange);
+            	alignment.setMySubjectFinish(temp.sPos + (wordLength) + endRange);
             	alignment.setMyScore(currScore);
             	alignment.setMyTraceback(new byte[alignment.myQueryFinish - alignment.myQueryStart]);
-            	Arrays.fill(alignment.getMyTraceback(), (byte) Alignment.QUERY_ALIGNED_WITH_SUBJECT);    
-                alignments.add(alignment);
+            	Arrays.fill(alignment.getMyTraceback(), (byte) Alignment.QUERY_ALIGNED_WITH_SUBJECT);
+            	//alignmentInfo(alignment);
+                if(false == alignments.add(alignment))
+                	System.out.println("alignment not added");
             }
         }
     
@@ -130,16 +156,38 @@ abstract public class BLAST
     private int indexOf(byte[] str, byte[] pat, int start)
     {
     	int found = -1;
-    	for(int i = start; i < str.length - pat.length; i++)
+    	
+    	for(int i = start; i < str.length - pat.length && found == -1; i++)
     	{
-    		for(int j = 0; j < pat.length; j++)
-    		{
-    			if(str[i] != pat[j])
-    				break;
+    		int j = 0;
+    		while(j < pat.length && str[i+j] == pat[j])
+    			j++;
+    		if(j == pat.length)
     			found = i;
-    		}
     	}
     	return found;
+    }
+    private byte[] getRange( byte[] array, int from, int to){
+    	byte[] newarray = new byte[ (to - from)];
+    	for(int i=from,j=0; i<to; i++,j++) newarray[j]=array[i];
+    	return newarray;
+    } 
+    
+    private void alignmentInfo(Alignment a)
+    {
+    	System.out.println("query " + a.getQueryStart() + "," + a.getQueryFinish());
+    	System.out.println("subject " + a.getSubjectStart() + "," + a.getSubjectFinish());
+    }
+    
+    private String byteToStr(byte[] a)
+    {
+    	StringBuilder out = new StringBuilder();
+    	
+    	for(int i = 0; i < a.length; i++)
+    	{
+    		out.append(a[i]+" ");
+    	}
+    	return out.toString();
     }
 }
 		
