@@ -23,6 +23,8 @@
 //
 //******************************************************************************
 
+package pjbio;
+
 /**
  * Class Blosum62 provides the BLOSUM-62 substitution matrix for protein
  * sequence alignment. The expression <TT>Blosum62.matrix[x][y]</TT> is the

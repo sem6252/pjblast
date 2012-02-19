@@ -1,6 +1,10 @@
-//This file is based on Alignment.java from the Parallel Java library. It has been modified to
-//provide setters for all of the classes's instance variables.
-
+/**
+ * The Alignment class has been modified and simplified to work within the requirements
+ * of the BLAST implementation. Notably, public setters have been added, and the traceback
+ * system removed since it is not used for ungapped alignments.
+ * 
+ * @editor Sean McGroty
+ */
 
 //******************************************************************************
 //
@@ -26,6 +30,8 @@
 // Web at http://www.gnu.org/licenses/gpl.html.
 //
 //******************************************************************************
+
+package pjbio;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -54,11 +60,10 @@ import java.io.ObjectOutput;
  * @version 03-Jul-2008
  */
 public class Alignment
-	implements Externalizable
-	{
+implements Externalizable
+{
 
-// Exported constants.
-
+	//Setters for instance variables
 	public void setMyQueryId(long myQueryId) {
 		this.myQueryId = myQueryId;
 	}
@@ -95,29 +100,7 @@ public class Alignment
 		this.mySubjectFinish = mySubjectFinish;
 	}
 
-	public void setMyTraceback(byte[] myTraceback) {
-		this.myTraceback = myTraceback;
-	}
-
-	/**
-	 * State of an alignment position: character in query sequence aligned with
-	 * character in subject sequence.
-	 */
-	public static final int QUERY_ALIGNED_WITH_SUBJECT = 0;
-
-	/**
-	 * State of an alignment position: character in query sequence aligned with
-	 * gap in subject sequence.
-	 */
-	public static final int QUERY_ALIGNED_WITH_GAP = 1;
-
-	/**
-	 * State of an alignment position: character in subject sequence aligned
-	 * with gap in query sequence.
-	 */
-	public static final int SUBJECT_ALIGNED_WITH_GAP = 2;
-
-// Hidden data members.
+	// Hidden data members.
 
 	private static final long serialVersionUID = 8656834485638780975L;
 
@@ -140,20 +123,17 @@ public class Alignment
 	int myQueryFinish;
 	int mySubjectFinish;
 
-	// Traceback information (in reverse order).
-	byte[] myTraceback;
-
-// Exported constructors.
+	// Exported constructors.
 
 	/**
 	 * Construct a new, uninitialized alignment object. This constructor is for
 	 * use only by object deserialization.
 	 */
 	public Alignment()
-		{
-		}
+	{
+	}
 
-// Exported operations.
+	// Exported operations.
 
 	/**
 	 * Get the ID associated with the query sequence. This is an arbitrary
@@ -163,9 +143,9 @@ public class Alignment
 	 * @return  Query sequence ID.
 	 */
 	public long getQueryId()
-		{
+	{
 		return myQueryId;
-		}
+	}
 
 	/**
 	 * Get the ID associated with the subject sequence. This is an arbitrary
@@ -175,9 +155,9 @@ public class Alignment
 	 * @return  Subject sequence ID.
 	 */
 	public long getSubjectId()
-		{
+	{
 		return mySubjectId;
-		}
+	}
 
 	/**
 	 * Get the length of the query sequence.
@@ -185,9 +165,9 @@ public class Alignment
 	 * @return  Query sequence length.
 	 */
 	public int getQueryLength()
-		{
+	{
 		return myQueryLength;
-		}
+	}
 
 	/**
 	 * Get the length of the subject sequence.
@@ -195,9 +175,9 @@ public class Alignment
 	 * @return  Subject sequence length.
 	 */
 	public int getSubjectLength()
-		{
+	{
 		return mySubjectLength;
-		}
+	}
 
 	/**
 	 * Get the index of the first aligned character in the query sequence. The
@@ -207,9 +187,9 @@ public class Alignment
 	 * @return  Query sequence start index.
 	 */
 	public int getQueryStart()
-		{
+	{
 		return myQueryStart;
-		}
+	}
 
 	/**
 	 * Get the index of the last aligned character in the query sequence. The
@@ -219,9 +199,9 @@ public class Alignment
 	 * @return  Query sequence finish index.
 	 */
 	public int getQueryFinish()
-		{
+	{
 		return myQueryFinish;
-		}
+	}
 
 	/**
 	 * Get the index of the first aligned character in the subject sequence.
@@ -231,9 +211,9 @@ public class Alignment
 	 * @return  Subject sequence start index.
 	 */
 	public int getSubjectStart()
-		{
+	{
 		return mySubjectStart;
-		}
+	}
 
 	/**
 	 * Get the index of the last aligned character in the subject sequence. The
@@ -243,63 +223,48 @@ public class Alignment
 	 * @return  Subject sequence finish index.
 	 */
 	public int getSubjectFinish()
-		{
+	{
 		return mySubjectFinish;
-		}
-
-	/**
-	 * Get the number of positions in the alignment. If a local alignment was
-	 * not found, 0 is returned.
-	 *
-	 * @return  Alignment length.
-	 */
-	public int getAlignmentLength()
-		{
-		return myTraceback.length;
-		}
-
-	/**
-	 * Get the state of the given position in the alignment. The index
-	 * <TT>i</TT> must be in the range 0 .. <I>L</I>&minus;1, where <I>L</I> is
-	 * the alignment length. The state of position <TT>i</TT> in the alignment
-	 * is returned, one of the following:
-	 * <UL>
-	 * <LI>{@link #QUERY_ALIGNED_WITH_SUBJECT}
-	 * <LI>{@link #QUERY_ALIGNED_WITH_GAP}
-	 * <LI>{@link #SUBJECT_ALIGNED_WITH_GAP}
-	 * </UL>
-	 *
-	 * @param  i  Position in the alignment.
-	 *
-	 * @return  State of position <TT>i</TT> in the alignment.
-	 */
-	public int getAlignment
-		(int i)
-		{
-		return myTraceback[myTraceback.length-1-i];
-		}
-
-	public byte[] getMyTraceback() {
-		return myTraceback;
 	}
-        
-        
-    //two alignments are equal if they refer to the exact same ranges
-    public boolean equals(Object other)
-        {
-    		System.out.println("query " + this.getQueryStart() + "," + this.getQueryFinish());
-    		System.out.println("subject " + this.getSubjectStart() + "," + this.getSubjectFinish());
-            return (this.mySubjectStart == ((Alignment)other).mySubjectStart && this.mySubjectFinish == ((Alignment)other).mySubjectFinish
-            && this.myQueryStart == ((Alignment)other).myQueryStart && this.myQueryFinish == ((Alignment)other).myQueryFinish);
-        }
-        
-        //a hash code
-        public int hashCode()
-        {
-            int hash = this.myScore << 16 | this.myQueryStart << 8 | this.myQueryFinish << 4 | this.mySubjectStart << 2 | this.mySubjectFinish << 1;
-            
-            return hash & 28; //hash mod 29
-        }
+
+	/**
+	 * Compare this alignment object to the given alignment object. The
+	 * comparison order depends on the alignment scores and the subject sequence
+	 * IDs. An alignment with a higher score comes before an alignment with a
+	 * lower score. If the scores are equal, an alignment with a lower subject
+	 * sequence ID comes before an alignment with a higher subject sequence ID.
+	 *
+	 * @param  alignment  Alignment to compare to.
+	 *
+	 * @return  An integer less than, equal to, or greater than 0 if this
+	 *          alignment comes before, is the same as, or comes after the given
+	 *          alignment, respectively.
+	 */
+	public int compareTo
+	(Alignment alignment)
+	{
+		if (this.myScore > alignment.myScore) return -1;
+		else if (this.myScore < alignment.myScore) return 1;
+		else if (this.mySubjectId < alignment.mySubjectId) return -1;
+		else if (this.mySubjectId > alignment.mySubjectId) return 1;
+		else return 0;
+	}
+
+	//two alignments are equal if they refer to the exact same ranges
+	public boolean equals(Object other)
+	{
+		return (this.mySubjectStart == ((Alignment)other).mySubjectStart && this.mySubjectFinish == ((Alignment)other).mySubjectFinish
+				&& this.myQueryStart == ((Alignment)other).myQueryStart && this.myQueryFinish == ((Alignment)other).myQueryFinish);
+	}
+
+	//a hash code
+	public int hashCode()
+	{
+		//mash some bits together
+		int hash = this.myScore << 16 | this.myQueryStart << 8 | this.myQueryFinish << 4 | this.mySubjectStart << 2 | this.mySubjectFinish << 1;
+
+		return hash & 28; //hash mod 29
+	}
 
 	/**
 	 * Returns a string version of this alignment object.
@@ -307,7 +272,7 @@ public class Alignment
 	 * @return  String version.
 	 */
 	public String toString()
-		{
+	{
 		StringBuilder b = new StringBuilder();
 		b.append ("Alignment(qid=");
 		b.append (myQueryId);
@@ -329,7 +294,7 @@ public class Alignment
 		b.append (mySubjectFinish);
 		b.append (")");
 		return b.toString();
-		}
+	}
 
 	/**
 	 * Write this alignment object to the given object output stream.
@@ -340,9 +305,9 @@ public class Alignment
 	 *     Thrown if an I/O error occurred.
 	 */
 	public void writeExternal
-		(ObjectOutput out)
-		throws IOException
-		{
+	(ObjectOutput out)
+			throws IOException
+			{
 		out.writeLong (myQueryId);
 		out.writeLong (mySubjectId);
 		out.writeInt (myQueryLength);
@@ -352,13 +317,7 @@ public class Alignment
 		out.writeInt (mySubjectStart);
 		out.writeInt (myQueryFinish);
 		out.writeInt (mySubjectFinish);
-		int n = myTraceback.length;
-		out.writeInt (n);
-		for (int i = 0; i < n; ++ i)
-			{
-			out.writeByte (myTraceback[i]);
 			}
-		}
 
 	/**
 	 * Read this alignment object from the given object input stream.
@@ -369,9 +328,9 @@ public class Alignment
 	 *     Thrown if an I/O error occurred.
 	 */
 	public void readExternal
-		(ObjectInput in)
-		throws IOException
-		{
+	(ObjectInput in)
+			throws IOException
+			{
 		myQueryId = in.readLong();
 		mySubjectId = in.readLong();
 		myQueryLength = in.readInt();
@@ -381,12 +340,5 @@ public class Alignment
 		mySubjectStart = in.readInt();
 		myQueryFinish = in.readInt();
 		mySubjectFinish = in.readInt();
-		int n = in.readInt();
-		myTraceback = new byte [n];
-		for (int i = 0; i < n; ++ i)
-			{
-			myTraceback[i] = in.readByte();
 			}
-		}
-
-	}
+}

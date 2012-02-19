@@ -22,7 +22,7 @@
 // Web at http://www.gnu.org/licenses/gpl.html.
 //
 //******************************************************************************
-
+package pjbio;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

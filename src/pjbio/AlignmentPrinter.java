@@ -1,3 +1,10 @@
+/**
+ * Class AlignmentPrinter was modified to remove the use of the traceback
+ * array in Alignment, as this project only uses ungapped alignments
+ * 
+ * @editor Sean McGroty
+ */
+
 //******************************************************************************
 //
 // File:    AlignmentPrinter.java
@@ -22,7 +29,7 @@
 // Web at http://www.gnu.org/licenses/gpl.html.
 //
 //******************************************************************************
-
+package pjbio;
 
 import java.io.PrintStream;
 
@@ -147,15 +154,12 @@ public class AlignmentPrinter
 		// Count identities, positives, and gaps.
 		int identities = 0;
 		int positives = 0;
-		int gaps = 0;
 		int qi = alignment.myQueryStart;
 		int si = alignment.mySubjectStart;
-		int n = alignment.myTraceback.length;
+		int n = alignment.myQueryFinish - alignment.myQueryStart;
 		for (int i = 0; i < n; ++ i)
 			{
-			switch (alignment.myTraceback[n-1-i])
-				{
-				case Alignment.QUERY_ALIGNED_WITH_SUBJECT:
+
 					byte query_qi = query.mySequence[qi];
 					byte subject_si = subject.mySequence[si];
 					if (query_qi == subject_si)
@@ -169,17 +173,7 @@ public class AlignmentPrinter
 						}
 					++ qi;
 					++ si;
-					break;
-				case Alignment.QUERY_ALIGNED_WITH_GAP:
-					++ gaps;
-					++ qi;
-					break;
-				case Alignment.SUBJECT_ALIGNED_WITH_GAP:
-					++ gaps;
-					++ si;
-					break;
 				}
-			}
 
 		// Print identities, positives, and gaps.
 		out.format
@@ -188,15 +182,11 @@ public class AlignmentPrinter
 			 n,
 			 ((double) identities)/((double) n)*100.0);
 		out.format
-			("Positives = %d/%d (%.0f%%), ",
+			("Positives = %d/%d (%.0f%%)",
 			 positives,
 			 n,
 			 ((double) positives)/((double) n)*100.0);
-		out.format
-			("Gaps = %d/%d (%.0f%%)%n",
-			 gaps,
-			 n,
-			 ((double) gaps)/((double) n)*100.0);
+		
 		out.println();
 
 		// Print aligned sequences.
@@ -213,17 +203,8 @@ public class AlignmentPrinter
 			j = 0;
 			while (j < 60 && i+j < n)
 				{
-				switch (alignment.myTraceback[n-1-i-j])
-					{
-					case Alignment.QUERY_ALIGNED_WITH_SUBJECT:
-					case Alignment.QUERY_ALIGNED_WITH_GAP:
-						out.print (query.charAt(qj));
-						++ qj;
-						break;
-					case Alignment.SUBJECT_ALIGNED_WITH_GAP:
-						out.print ('-');
-						break;
-					}
+				out.print (query.charAt(qj));
+				++ qj;
 				++ j;
 				}
 			out.format ("%6d%n", qj-1);
@@ -233,9 +214,6 @@ public class AlignmentPrinter
 			j = 0;
 			while (j < 60 && i+j < n)
 				{
-				switch (alignment.myTraceback[n-1-i-j])
-					{
-					case Alignment.QUERY_ALIGNED_WITH_SUBJECT:
 						byte query_qj = query.mySequence[qj];
 						byte subject_sj = subject.mySequence[sj];
 						if (query_qj == subject_sj)
@@ -252,16 +230,6 @@ public class AlignmentPrinter
 							}
 						++ qj;
 						++ sj;
-						break;
-					case Alignment.QUERY_ALIGNED_WITH_GAP:
-						out.print (' ');
-						++ qj;
-						break;
-					case Alignment.SUBJECT_ALIGNED_WITH_GAP:
-						out.print (' ');
-						++ sj;
-						break;
-					}
 				++ j;
 				}
 			out.println();
@@ -271,22 +239,9 @@ public class AlignmentPrinter
 			j = 0;
 			while (j < 60 && i+j < n)
 				{
-				switch (alignment.myTraceback[n-1-i-j])
-					{
-					case Alignment.QUERY_ALIGNED_WITH_SUBJECT:
-						out.print (subject.charAt(sj));
-						++ qj;
-						++ sj;
-						break;
-					case Alignment.QUERY_ALIGNED_WITH_GAP:
-						out.print ('-');
-						++ qj;
-						break;
-					case Alignment.SUBJECT_ALIGNED_WITH_GAP:
-						out.print (subject.charAt(sj));
-						++ sj;
-						break;
-					}
+				out.print (subject.charAt(sj));
+				++ qj;
+				++ sj;
 				++ j;
 				}
 			out.format ("%6d%n", sj-1);

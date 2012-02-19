@@ -22,7 +22,7 @@
 // Web at http://www.gnu.org/licenses/gpl.html.
 //
 //******************************************************************************
-
+package pjbio;
 
 import java.util.Arrays;
 
@@ -46,7 +46,7 @@ public abstract class Sequence
 
 	String myDescription;
 	byte[] mySequence;
-	int myLength;
+	public int myLength;
 
 // Exported constructors.
 
